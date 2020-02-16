@@ -1,25 +1,29 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { getTracks } from './actions/tracks';
+import { Link } from 'react-router';
+import  Menu from './Menu';
 
-function App(props) {
+function App({tracks, onAddTrack, onFindTrack, onGetTracks, ownProps}) {
+  console.log(tracks)
+  console.log(ownProps)
     let trackInput, searchInput;
-
     const addTrack = () => {
       const trackName = trackInput.value;
       if (trackName) {
-        props.onAddTrack(trackName);
+        onAddTrack(trackName);
         trackInput.value = null
       }
     }
 
     const findTrack = () => {
       const searchValue = searchInput.value;
-      props.onFindTrack(searchValue)
+      onFindTrack(searchValue)
     }
 
     return (
       <div>
+        <Menu />
         <div>
           <input type="text" ref={(input) => trackInput = input}/>
           <button onClick={addTrack}>Add Track</button>
@@ -29,12 +33,13 @@ function App(props) {
           <button onClick={findTrack}>Find Track</button>
         </div>
         <div>
-          <button onClick={props.onGetTracks}>Get Tracks</button>
+          <button onClick={onGetTracks}>Get Tracks</button>
         </div>
         <ul className="list">
           {
-            props.tracks.map((track, index) => 
-            <li key={index}>{track.name}</li>)
+            tracks.map((track, index) => 
+            <li key={index}>
+              <Link to={`/tracks/${track.id}`}>{track.name}</Link></li>)
           }
         </ul>
       </div>
@@ -43,8 +48,9 @@ function App(props) {
 
 
 export default connect(
-  state => ({
-    tracks: state.tracks.filter(track => track.name.includes(state.filterTracks))
+  (state, ownProps) => ({
+    tracks: state.tracks.filter(track => track.name.includes(state.filterTracks)),
+    ownProps
   }),
   dispatch => ({
     onAddTrack: (name) => {
